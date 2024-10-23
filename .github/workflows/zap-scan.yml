@@ -1,0 +1,25 @@
+name: ZAP Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install OWASP ZAP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zaproxy
+
+      - name: Run ZAP scan
+        run: |
+          zap.sh -cmd -quickurl http://juiceshop.herokuapp.com -quickout zap_report.html -quickreport html
