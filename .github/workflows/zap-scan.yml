@@ -5,15 +5,16 @@ on: [push]
 jobs:
   zap:
     runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install OWASP ZAP
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y zaproxy
-
-      - name: Run ZAP scan
-        run: |
-          zap.sh -cmd -quickurl http://juiceshop.herokuapp.com -quickout zap_report.html -quickreport html
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: OWASP ZAP Baseline Scan
+        # You may pin to the exact commit or the version.
+        # uses: zaproxy/action-baseline@7cea08522cd386f6c675776d5e4296aecf61f33b
+        uses: zaproxy/action-baseline@v0.7.0
+        with:
+          # Target URL
+          target: "https://juice-shop.herokuapp.com/#/"
