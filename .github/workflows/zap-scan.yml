@@ -18,3 +18,4 @@ jobs:
         with:
           # Target URL
           target: "https://juice-shop.herokuapp.com/#/"
+          cmd_options: '-g gen.conf -r testreport.html'
