@@ -19,7 +19,7 @@ jobs:
           
       - name: Generate SonarQube JSON Report
         run: |
-          curl --request GET --url '${{ secrets.SONAR_HOST_URL }}/api/issues/search?components=OWASP Juice' --header 'Authorization: Bearer ${{ secrets.SONARQUBE_TOKEN }}' -o ${{github.workspace}}/sonar_report.json
+          curl --request GET --url '${{ secrets.SONAR_HOST_URL }}/api/issues/search?components=OWASP-Juice' --header 'Authorization: Bearer ${{ secrets.SONARQUBE_TOKEN }}' -o ${{github.workspace}}/sonar_report.json
           
       - name: Push SonarQube Report to DefectDojo
         run: |
