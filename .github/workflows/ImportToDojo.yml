@@ -14,7 +14,7 @@ jobs:
       - name: Check if the product exists in DefectDojo
         id: api_request
         run: |
-          curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/products/?name=OWASP Juice' -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > product_details.json
+          curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/products/?name=OWASP%20Juice' -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > product_details.json
           count=$(jq '.count' product_details.json)
           echo "::set-output name=count::$count"
       - name: Add the product
