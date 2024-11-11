@@ -23,7 +23,7 @@ jobs:
             cat create_product.json
             echo "{product_id}={$product_id}" >> $GITHUB_OUTPUT
           else
-            echo "{product_id}={jq '.results[0].id product_details.json}" >> $GITHUB_OUTPUT
+            echo "{product_id}={$(jq '.results[0].id product_details.json)}" >> $GITHUB_OUTPUT
           fi
           
       - name: Check for engagements in the product
@@ -35,20 +35,20 @@ jobs:
           if [ $engagement_count -eq 0 ];then
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "SonarQube Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
                       "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": ${{steps.get_product.out.product_id}}}' > sonar_engagement.json
-            echo "{sonar_qube_id}={jq '.results[0].id' sonar_engagement.json}" >> $GITHUB_OUTPUT
+            echo "{sonar_qube_id}={$(jq '.results[0].id' sonar_engagement.json)}" >> $GITHUB_OUTPUT
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "Dependency-Check Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
                       "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": ${{steps.get_product.out.product_id}}}' > dependency_check_engagement.json
-            echo "{dependenct_check_id}={jq '.results[0].id' dependency_check_engagement.json}" >> $GITHUB_OUTPUT
+            echo "{dependenct_check_id}={S(jq '.results[0].id' dependency_check_engagement.json)}" >> $GITHUB_OUTPUT
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "ZAP Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
                       "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": ${{steps.get_product.out.product_id}}}' > zap_engagement.json
-            echo "{zap_id}={jq '.results[0].id' zap_engagement.json}" >> $GITHUB_OUTPUT
+            echo "{zap_id}={$(jq '.results[0].id' zap_engagement.json)}" >> $GITHUB_OUTPUT
           else
             curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=SonarQube%20Scan&product=${{steps.api_request.out.product_id}}'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > sonar_engagement.json
-            echo "{sonar_qube_id}={jq '.results[0].id' sonar_engagement.json}" >> $GITHUB_OUTPUT
+            echo "{sonar_qube_id}={$(jq '.results[0].id' sonar_engagement.json)}" >> $GITHUB_OUTPUT
             curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=Dependency%20Check%20Scan&product=${{steps.api_request.out.product_id}}'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > dependency_check_engagement.json
-            echo "{dependenct_check_id}={jq '.results[0].id' dependency_check_engagement.json}" >> $GITHUB_OUTPUT
+            echo "{dependenct_check_id}={$(jq '.results[0].id' dependency_check_engagement.json)}" >> $GITHUB_OUTPUT
             curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=ZAP%20Scan&product=${{steps.api_request.out.product_id}}'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > zap_engagement.json
-            echo "{zap_id}={jq '.results[0].id' zap_engagement.json}" >> $GITHUB_OUTPUT
+            echo "{zap_id}={$(jq '.results[0].id' zap_engagement.json)}" >> $GITHUB_OUTPUT
           fi
           
     
