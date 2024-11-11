@@ -32,7 +32,6 @@ jobs:
           curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/engagements/?product=${{steps.api_request.outputs.product_id}}' -H 'accept: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > engagements.json
           engagement_count=$(jq '.count' engagements.json)
           if [ $engagement_count -eq 0 ];then
-            echo "Test 1"
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json'   -H 'Content-Type: multipart/form-data' \
             -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" \
             -F 'name=SonarQube Results'  -F 'target_start="$(date +'%Y-%m-%d')"' \
