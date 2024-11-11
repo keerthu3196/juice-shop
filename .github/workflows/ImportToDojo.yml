@@ -16,7 +16,7 @@ jobs:
         run: |
           curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/products/?name=OWASP%20Juice' -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > product_details.json
           count=$(jq '.count' product_details.json)
-          cat $count
+          echo $count
           if [ $count -eq 0];then
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/products/' -H 'accept: application/json' -H 'Content-Type: multipart/form-data' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -F 'prod_type=1'   -F 'name=OWASP Juice'  -F 'description=OWASP Juice' > create_product.json
             product_id=$(jq '.id' create_product.json)
