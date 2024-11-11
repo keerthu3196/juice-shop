@@ -3,9 +3,44 @@ name: DevOps Guardrails
 on: [push]
 
 jobs:
-
+  defectdojo:
+    name: Defect Dojo
+    runs-on: ubuntu-latest
+      
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+      - name: Check if the product exists in DefectDojo
+        id: api_request
+        run: |
+          curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/products/?name=OWASP Juice' -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > product_details.json
+          count=$(jq '.count' product_details.json)
+          echo "::set-output name=count::$count"
+      - name: Add the product
+        id: add_product
+        if: steps.api_requests.out.count == 0
+        run:  |
+          curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/products/' -H 'accept: application/json' -H 'Content-Type: multipart/form-data' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -F 'prod_type=1'   -F 'name=OWASP Juice'  -F 'description=OWASP Juice' > create_product.json
+          product_id=$(jq '.id' create_product.json)
+          echo "::set-output name=product_id::$product_id"
+          
+      - name: Check for engagements in the product
+        id: get_product
+        if: steps.api_requests.out.count != 0
+        run:  |
+          curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/engagements/?product=steps.add_product.out.product_id' -H 'accept: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > engagements.json
+          engagement_count=$(jq '.count' engagement.json)
+          if [ $engagement_count == 0];then
+            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "SonarQube Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
+                      "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": steps.get_product.out.product_id}'
+            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "Dependency-Check Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
+                      "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": steps.get_product.out.product_id}'
+            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "ZAP Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
+                      "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": steps.get_product.out.product_id}'
+    
   sonarqube:
-    name: Build and analyze
+    name: SonarQube
     runs-on: ubuntu-latest
     
     steps:
@@ -20,7 +55,12 @@ jobs:
       - name: Generate SonarQube JSON Report
         run: |
           curl --request GET --url '${{ secrets.SONAR_HOST_URL }}/api/issues/search?components=OWASP-Juice' --header 'Authorization: Bearer ${{ secrets.SONARQUBE_TOKEN }}' -o ${{github.workspace}}/sonar_report.json
-          
+     
+      - name: Check if the engagement exists for the product in DefectDojo
+        id: api_request_engagement
+        run: |
+
+
       - name: Push SonarQube Report to DefectDojo
         run: |
           curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/import-scan/' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -H 'accept: application/json' -H 'Content-Type: multipart/form-data'  -F 'engagement_name=SonarQube Results'   -F 'scan_type=SonarQube Scan' -F 'deduplication_on_engagement=true' -F 'auto_create_context=true' -F 'product_name=OWASP Juice' -F 'file=@${{github.workspace}}/sonar_report.json;type=application/json' 
