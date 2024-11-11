@@ -50,7 +50,7 @@ jobs:
             -F 'product=${{steps.get_product.outputs.product_id}}}' \
             -F 'engagement_type=Interactive' \
             -F 'description=Dependency Check Results' > dependency_check_engagement.json
-            echo dependenct_check_id=S(jq '.results[0].id' dependency_check_engagement.json) >> $GITHUB_OUTPUT
+            echo dependenct_check_id=$(jq '.results[0].id' dependency_check_engagement.json) >> $GITHUB_OUTPUT
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H  -H 'Content-Type: multipart/form-data' \
             -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" \
             -F 'name=ZAP Scan Results'  -F 'target_start="$(date +'%Y-%m-%d')"' \
