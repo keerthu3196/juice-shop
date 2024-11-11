@@ -33,14 +33,32 @@ jobs:
           engagement_count=$(jq '.count' engagements.json)
           cat engagements.json
           if [ $engagement_count -eq 0 ];then
-            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "SonarQube Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
-                      "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": ${{steps.get_product.outputs.product_id}}}' > sonar_engagement.json
+            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json'   -H 'Content-Type: multipart/form-data' \
+            -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" \
+            -F 'name=SonarQube Results'  -F 'target_start="$(date +'%Y-%m-%d')"' \
+            -F 'target_end="$(date +'%Y-%m-%d')"' \
+            -F 'deduplication_on_engagement=true' \
+            -F 'product=${{steps.get_product.outputs.product_id}}}' \
+            -F 'engagement_type=Interactive' \
+            -F 'description=SonarQube Results' > sonar_engagement.json
             echo sonar_qube_id=$(jq '.results[0].id' sonar_engagement.json) >> $GITHUB_OUTPUT
-            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "Dependency-Check Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
-                      "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": ${{steps.get_product.outputs.product_id}}}' > dependency_check_engagement.json
+            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json'  -H 'Content-Type: multipart/form-data' \
+            -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" \
+            -F 'name=Dependency Check Results'  -F 'target_start="$(date +'%Y-%m-%d')"' \
+            -F 'target_end="$(date +'%Y-%m-%d')"' \
+            -F 'deduplication_on_engagement=true' \
+            -F 'product=${{steps.get_product.outputs.product_id}}}' \
+            -F 'engagement_type=Interactive' \
+            -F 'description=Dependency Check Results' > dependency_check_engagement.json
             echo dependenct_check_id=S(jq '.results[0].id' dependency_check_engagement.json) >> $GITHUB_OUTPUT
-            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "ZAP Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
-                      "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": ${{steps.get_product.outputs.product_id}}}' > zap_engagement.json
+            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H  -H 'Content-Type: multipart/form-data' \
+            -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" \
+            -F 'name=ZAP Scan Results'  -F 'target_start="$(date +'%Y-%m-%d')"' \
+            -F 'target_end="$(date +'%Y-%m-%d')"' \
+            -F 'deduplication_on_engagement=true' \
+            -F 'product=${{steps.get_product.outputs.product_id}}}' \
+            -F 'engagement_type=Interactive' \
+            -F 'description=ZAP Scan Results' > zap_engagement.json
             echo zap_id=$(jq '.results[0].id' zap_engagement.json) >> $GITHUB_OUTPUT
           else
             curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=SonarQube%20Scan&product=${{steps.api_request.outputs.product_id}}'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > sonar_engagement.json
