@@ -23,7 +23,7 @@ jobs:
             cat create_product.json
             echo product_id=$product_id >> $GITHUB_OUTPUT
           else
-            echo product_id=$(jq '.results[0].id' product_details.json)" >> $GITHUB_OUTPUT
+            echo product_id=$(jq '.results[0].id' product_details.json) >> $GITHUB_OUTPUT
           fi
           
       - name: Check for engagements in the product
