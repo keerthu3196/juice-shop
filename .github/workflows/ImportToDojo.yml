@@ -16,19 +16,17 @@ jobs:
         run: |
           curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/products/?name=OWASP%20Juice' -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > product_details.json
           count=$(jq '.count' product_details.json)
-          echo "{count}={$count}" >> $GITHUB_OUTPUT
-      - name: Add the product
-        id: add_product
-        if: steps.api_requests.out.count == 0
-        run:  |
-          curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/products/' -H 'accept: application/json' -H 'Content-Type: multipart/form-data' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -F 'prod_type=1'   -F 'name=OWASP Juice'  -F 'description=OWASP Juice' > create_product.json
-          product_id=$(jq '.id' create_product.json)
-          echo "{product_id}={$product_id}" >> $GITHUB_OUTPUT
+          if [ $count == 0];then
+            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/products/' -H 'accept: application/json' -H 'Content-Type: multipart/form-data' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -F 'prod_type=1'   -F 'name=OWASP Juice'  -F 'description=OWASP Juice' > create_product.json
+            product_id=$(jq '.id' create_product.json)
+            echo "{product_id}={$product_id}" >> $GITHUB_OUTPUT
+          else
+            echo "{product_id}={jq '.results[0].id product_details.json}" >> $GITHUB_OUTPUT
           
       - name: Check for engagements in the product
         id: get_product
         run:  |
-          curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/engagements/?product=steps.add_product.out.product_id' -H 'accept: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > engagements.json
+          curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/engagements/?product=steps.api_request.out.product_id' -H 'accept: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > engagements.json
           engagement_count=$(jq '.count' engagements.json)
           if [ $engagement_count == 0];then
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "SonarQube Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
@@ -41,11 +39,11 @@ jobs:
                       "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": steps.get_product.out.product_id}' > zap_engagement.json
             echo "{zap_id}={jq '.results[0].id' zap_engagement.json}" >> $GITHUB_OUTPUT
           else
-            curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=SonarQube%20Scan&product=4'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > sonar_engagement.json
+            curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=SonarQube%20Scan&product=steps.api_request.out.product_id'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > sonar_engagement.json
             echo "{sonar_qube_id}={jq '.results[0].id' sonar_engagement.json}" >> $GITHUB_OUTPUT
-            curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=Dependency%20Check%20Scan&product=4'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > dependency_check_engagement.json
+            curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=Dependency%20Check%20Scan&product=steps.api_request.out.product_id'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > dependency_check_engagement.json
             echo "{dependenct_check_id}={jq '.results[0].id' dependency_check_engagement.json}" >> $GITHUB_OUTPUT
-            curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=ZAP%20Scan&product=4'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > zap_engagement.json
+            curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=ZAP%20Scan&product=steps.api_request.out.product_id'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > zap_engagement.json
             echo "{zap_id}={jq '.results[0].id' zap_engagement.json}" >> $GITHUB_OUTPUT
           fi
           
