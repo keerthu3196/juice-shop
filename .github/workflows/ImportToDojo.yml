@@ -27,8 +27,9 @@ jobs:
       - name: Check for engagements in the product
         id: get_product
         run:  |
-          curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/engagements/?product=steps.api_request.out.product_id' -H 'accept: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > engagements.json
+          curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/engagements/?product=${{steps.api_request.out.product_id}}' -H 'accept: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > engagements.json
           engagement_count=$(jq '.count' engagements.json)
+          cat engagements.json
           if [ $engagement_count == 0];then
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -d '{"tags": ["string"],"name": "SonarQube","description": "SonarQube Scan","first_contacted": "2024-11-08","target_start": "$(date +'%Y-%m-%d')" ,"target_end": "2024-11-08","threat_model": true, \
                       "api_test": true, "pen_test": true,"check_list": true, "status": "Not Started", "engagement_type": "Interactive","product": ${{steps.get_product.out.product_id}}}' > sonar_engagement.json
