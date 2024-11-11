@@ -38,7 +38,7 @@ jobs:
             -F 'name=SonarQube Results'  -F 'target_start="$(date +'%Y-%m-%d')"' \
             -F 'target_end="$(date +'%Y-%m-%d')"' \
             -F 'deduplication_on_engagement=true' \
-            -F 'product=${{steps.get_product.outputs.product_id}}}' \
+            -F 'product=${{steps.get_product.outputs.product_id}}' \
             -F 'engagement_type=Interactive' \
             -F 'description=SonarQube Results' > sonar_engagement.json
             echo sonar_qube_id=$(jq '.results[0].id' sonar_engagement.json) >> $GITHUB_OUTPUT
@@ -47,7 +47,7 @@ jobs:
             -F 'name=Dependency Check Results'  -F 'target_start="$(date +'%Y-%m-%d')"' \
             -F 'target_end="$(date +'%Y-%m-%d')"' \
             -F 'deduplication_on_engagement=true' \
-            -F 'product=${{steps.get_product.outputs.product_id}}}' \
+            -F 'product=${{steps.get_product.outputs.product_id}}' \
             -F 'engagement_type=Interactive' \
             -F 'description=Dependency Check Results' > dependency_check_engagement.json
             echo dependenct_check_id=$(jq '.results[0].id' dependency_check_engagement.json) >> $GITHUB_OUTPUT
@@ -56,7 +56,7 @@ jobs:
             -F 'name=ZAP Scan Results'  -F 'target_start="$(date +'%Y-%m-%d')"' \
             -F 'target_end="$(date +'%Y-%m-%d')"' \
             -F 'deduplication_on_engagement=true' \
-            -F 'product=${{steps.get_product.outputs.product_id}}}' \
+            -F 'product=${{steps.get_product.outputs.product_id}}' \
             -F 'engagement_type=Interactive' \
             -F 'description=ZAP Scan Results' > zap_engagement.json
             echo zap_id=$(jq '.results[0].id' zap_engagement.json) >> $GITHUB_OUTPUT
