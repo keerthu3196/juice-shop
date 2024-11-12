@@ -60,7 +60,7 @@ jobs:
             curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=Dependency%20Check%20Scan&product=${{steps.api_request.outputs.product_id}}'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > dependency_check_engagement.json
             echo dependenct_check_id=$(jq '.results[0].id' dependency_check_engagement.json) >> $GITHUB_OUTPUT
             curl -X 'GET'   '${{ secrets.DOJO_URL }}/api/v2/engagements/?name=ZAP%20Scan&product=${{steps.api_request.outputs.product_id}}'   -H 'accept: application/json'  -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > zap_engagement.json
-            echo zap_id=$(jq '.results[0].id' zap_engagement.json)" >> $GITHUB_OUTPUT
+            echo zap_id=$(jq '.results[0].id' zap_engagement.json) >> $GITHUB_OUTPUT
           fi
           
     
