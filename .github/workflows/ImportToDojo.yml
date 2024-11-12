@@ -32,7 +32,6 @@ jobs:
         run:  |
           curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/engagements/?product=${{steps.api_request.outputs.product_id}}' -H 'accept: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > engagements.json
           engagement_count=$(jq '.count' engagements.json)
-          echo current_date=$(date +'%Y-%m-%d')  >> $GITHUB_OUTPUT
           if [ $engagement_count -eq 0 ];then
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json'   -H 'Content-Type: multipart/form-data' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -F 'name=SonarQube Results'  -F 'target_start=${{steps.get_product.outputs.current_date}}' -F 'target_end=${{steps.get_product.outputs.current_date}}' -F 'deduplication_on_engagement=true' -F 'product=${{steps.get_product.outputs.product_id}}' -F 'engagement_type=Interactive' -F 'description=SonarQube Results' > sonar_engagement.json
             cat sonar_engagement.json
