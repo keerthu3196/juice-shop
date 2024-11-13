@@ -27,7 +27,7 @@ jobs:
           fi
           
       - name: Check for engagements in the product
-        id: get_product
+        id: get_product_id
         run:  |
           curl -X 'GET' '${{ secrets.DOJO_URL }}/api/v2/engagements/?product=${{steps.api_request.outputs.product_id}}' -H 'accept: application/json' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" > engagements.json
           engagement_count=$(jq '.count' engagements.json)
@@ -42,6 +42,7 @@ jobs:
             -F 'description=SonarQube Results' > sonar_engagement.json
             cat sonar_engagement.json
             echo sonar_qube_id=$(jq '.results[0].id' sonar_engagement.json) >> $GITHUB_OUTPUT
+            cat ${{steps.get_product_id.outputs.sonar_qube_id}}
             curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/engagements/' -H 'accept: application/json'  -H 'Content-Type: multipart/form-data' \
             -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" \
             -F 'name=Dependency Check Results'  -F 'target_start=2024-11-13' \
