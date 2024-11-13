@@ -92,7 +92,7 @@ jobs:
 
       - name: Push SonarQube Report to DefectDojo
         run: |
-           curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/import-scan/' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -H 'accept: application/json' -H 'Content-Type: multipart/form-data'  -F 'engagement=${{steps.get_product_id.outputs.sonar_qube_id}}' -F 'product_name=OWASP Juice'  -F 'scan_type=SonarQube Scan'  -F 'engagement_name=SonarQube Results' -F 'deduplication_on_engagement=true' -F 'auto_create_context=true' -F 'file=@sonar_report.json;type=application/json'
+           curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/import-scan/' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -H 'accept: application/json' -H 'Content-Type: multipart/form-data'  -F 'engagement=${{defectdojo.steps.get_product_id.outputs.sonar_qube_id}}' -F 'product_name=OWASP Juice'  -F 'scan_type=SonarQube Scan'  -F 'engagement_name=SonarQube Results' -F 'deduplication_on_engagement=true' -F 'auto_create_context=true' -F 'file=@${{github.workspace}}/sonar_report.json;type=application/json'
 
   dependency-check:
     name: Dependency-Check
@@ -109,7 +109,7 @@ jobs:
           rm -rf dependency-check*
       - name: Push Dependency Check Report to DefectDojo
         run: |
-          curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/import-scan/' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -H 'accept: application/json' -H 'Content-Type: multipart/form-data'  -F 'engagement=${{steps.get_product_id.outputs.dependency_check_id}}'  -F 'product_name=OWASP Juice' -F 'scan_type=Dependency Check Scan'  -F 'engagement_name=Dependency Check Results'  -F 'deduplication_on_engagement=true'  -F 'auto_create_context=true' -F 'file=@${{github.workspace}}/app-dependency-check-report.html;type=text/html' 
+          curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/import-scan/' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -H 'accept: application/json' -H 'Content-Type: multipart/form-data'  -F 'engagement=${{defectdojo.steps.get_product_id.outputs.dependency_check_id}}'  -F 'product_name=OWASP Juice' -F 'scan_type=Dependency Check Scan'  -F 'engagement_name=Dependency Check Results'  -F 'deduplication_on_engagement=true'  -F 'auto_create_context=true' -F 'file=@${{github.workspace}}/app-dependency-check-report.html;type=text/html' 
    
   zap-scan:
       name: ZAP-Check
@@ -132,4 +132,4 @@ jobs:
         
         - name: Push Dependency Check Report to DefectDojo
           run: |
-            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/import-scan/' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -H 'accept: application/json' -H 'Content-Type: multipart/form-data'  -F 'engagement=${{steps.get_product_id.outputs.zap_id}}'  -F 'product_name=OWASP Juice' -F 'scan_type=Dependency Check Scan'  -F 'engagement_name=ZAP Scan Results' -F 'deduplication_on_engagement=true'  -F 'auto_create_context=true' -F 'file=@$report.xml;type=text/html' 
+            curl -X 'POST' '${{ secrets.DOJO_URL }}/api/v2/import-scan/' -H "Authorization: Token ${{secrets.DOJO_API_KEY}}" -H 'accept: application/json' -H 'Content-Type: multipart/form-data'  -F 'engagement=${{defectdojo.steps.get_product_id.outputs.zap_id}}'  -F 'product_name=OWASP Juice' -F 'scan_type=Dependency Check Scan'  -F 'engagement_name=ZAP Scan Results' -F 'deduplication_on_engagement=true'  -F 'auto_create_context=true' -F 'file=@$report.xml;type=text/html' 
